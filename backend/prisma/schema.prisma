@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+   id          Int      @id @default(autoincrement())
+   name        String
+   email       String   @unique
+   password    String
+   role        String   @default("user") // user, admin, moderator
+   ads         Ad[]
+   statusChanges AdStatusHistory[]
+   createdAt   DateTime @default(now())
+   updatedAt   DateTime @updatedAt
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  ads       Ad[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ad {
+    id                Int       @id @default(autoincrement())
+    title             String    @db.VarChar(255)
+    description       String    @db.Text
+    price             Float
+    imageUrl          String?
+    status            String    @default("pending_verification") // pending_verification, active, expired, rejected, sold, validated
+    verificationStatus String    @default("in_review") // in_review, verified, rejected
+    verificationReason String?
+    publishedAt       DateTime?
+    expiresAt         DateTime?
+    soldAt            DateTime?
+    soldReason        String?
+    categoryId        Int
+    userId            Int
+    category          Category  @relation(fields: [categoryId], references: [id])
+    user              User      @relation(fields: [userId], references: [id])
+    statusHistory     AdStatusHistory[]
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt
+}
+
+model AdStatusHistory {
+   id          Int      @id @default(autoincrement())
+   adId        Int
+   oldStatus   String
+   newStatus   String
+   reason      String?
+   changedBy   Int      // userId who made the change
+   ad          Ad       @relation(fields: [adId], references: [id], onDelete: Cascade)
+   user        User     @relation(fields: [changedBy], references: [id])
+   createdAt   DateTime @default(now())
+}
