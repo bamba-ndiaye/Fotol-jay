@@ -187,9 +187,22 @@ const Dashboard = () => {
               <div className="h-48 bg-gray-200 relative">
                 {ad.imageUrl ? (
                   <img
-                    src={ad.imageUrl}
+                    src={`${ad.imageUrl}`}
                     alt={ad.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Erreur chargement image:', ad.imageUrl);
+                      // Fallback si l'image ne charge pas
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-400"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></div>';
+                      }
+                    }}
+                    onLoad={() => {
+                      console.log('Image chargée avec succès:', ad.imageUrl);
+                    }}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">

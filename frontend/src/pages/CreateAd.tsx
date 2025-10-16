@@ -96,7 +96,7 @@ const CreateAd = () => {
         console.log('⚠️ Caméra arrière non disponible, tentative caméra frontale...');
         constraints = {
           video: {
-            facingMode: 'user',
+            facingMode: { ideal: 'user' },
             width: { ideal: 1280 },
             height: { ideal: 720 }
           }
@@ -445,6 +445,9 @@ const CreateAd = () => {
                   src={previewUrl}
                   alt="Preview"
                   className="w-full h-64 object-cover rounded-lg"
+                  onError={(e) => {
+                    console.error('Erreur de chargement de l\'image preview');
+                  }}
                 />
                 <button
                   type="button"
